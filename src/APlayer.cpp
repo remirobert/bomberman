@@ -83,8 +83,8 @@ bool	APlayer::movePlayer(const movementCoef *mcoef, float const distance)
 
   if ((glm::ivec2(toGoLeft) == glm::ivec2(_vec + mcoef->distLeft) &&
        glm::ivec2(toGoRight) == glm::ivec2(_vec + mcoef->distRight)) ||
-      (_map->getTypeAt(toGoLeft.x, toGoLeft.y) == NONE &&
-       _map->getTypeAt(toGoRight.x, toGoRight.y) == NONE))
+      (_map->getTypeAt(toGoLeft.x, toGoLeft.y, _around) == NONE &&
+       _map->getTypeAt(toGoRight.x, toGoRight.y, _around) == NONE))
     {
       _vec += mcoef->dir * distance;
       _obj->translate(mcoef->translate * distance);
@@ -137,6 +137,16 @@ bool APlayer::bomb()
       prevY = y;
   }
   return false;
+}
+
+void	APlayer::addEntityAround(const IEntity *entity)
+{
+  _around.push_back(entity);
+}
+
+void	APlayer::clearEntityAround()
+{
+  _around.clear();
 }
 
 IEntity::Type APlayer::getType() const

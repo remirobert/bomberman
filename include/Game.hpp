@@ -42,8 +42,8 @@ private:
   void drawGraphicObject(gdl::AShader *shader, gdl::Clock const &clock) const;
 
 private:
-  std::vector<Ia *> _listIA; //Why not Ia and player doesn't hineretaded from the same class ?
-  std::vector<Player *> _players; //Those are IEntity
+  // std::vector<Ia *> _listIA; //Why not Ia and player doesn't hineretaded from the same class ?
+  std::vector<APlayer *> _players; //Those are IEntity players + IA
   Map *_currentMap;
   glm::ivec2 _win;
   Cube *_cube;

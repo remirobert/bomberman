@@ -23,8 +23,6 @@ public:
   typedef std::list<IEntity *>::iterator iterator;
 
 private:
-  // int		_x;
-  // int		_y;
   glm::vec2	_dim;
   IMutex	*_mutex;
   LMap		_map;
@@ -40,7 +38,10 @@ public:
   IEntity	*getEntityAt(const int x, const int y) const;
   bool		addEntity(IEntity *entity);
   bool		deleteEntityAt(const int x, const int y);
+
   IEntity::Type	getTypeAt(const int x, const int y) const;
+  IEntity::Type	getTypeAt(const int x, const int y, std::vector<const IEntity *> list) const;
+
   Map::iterator	begin();
   Map::iterator	end();
 

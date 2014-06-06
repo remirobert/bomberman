@@ -63,6 +63,8 @@ protected:
   int		_lvl;
   std::map<int, movementCoef *>	_moveConf;
 
+  std::vector<const IEntity *>	_around;
+
 protected:
   APlayer(const glm::vec2 &pos, Map *map);
 
@@ -79,6 +81,8 @@ public:
   virtual void  setStatus(APlayer::Status);
   virtual IEntity::Status getStatus() const;
   virtual void setStatus(IEntity::Status status);
+  virtual void	addEntityAround(const IEntity *entity);
+  virtual void  clearEntityAround();
 
 protected:
   virtual bool	movePlayer(const movementCoef *mcoef, float const distance);

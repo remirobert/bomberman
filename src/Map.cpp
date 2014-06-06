@@ -206,6 +206,22 @@ IEntity::Type	Map::getTypeAt(const int x, const int y) const
   return type;
 }
 
+IEntity::Type	Map::getTypeAt(const int x, const int y, std::vector<const IEntity *> list) const
+{
+  IEntity::Type type = IEntity::NONE;
+
+  for (std::vector<const IEntity *>::const_iterator it = list.begin(), end = list.end();
+       it != end; ++it)
+    if ((*(*it)).getPos().x == x && (*(*it)).getPos().y == y) {
+      type = (*it)->getType();
+      if (type == IEntity::PLAYER)
+	type = IEntity::NONE;
+      if (type != IEntity::NONE)
+	return type;
+    }
+  return type;
+}
+
 /*
 ** Add an entity in the map if it's possible, else return false
 */

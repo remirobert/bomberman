@@ -23,7 +23,6 @@ Game::Game(const glm::ivec2& win, std::string const &saveGame)
 Game::Game(const glm::ivec2& win, int numberPlayer, int numberIA, std::string const & algoFileName,
            std::string const &mapName)
 {
-  int i;
 
   if (numberIA < 0 || numberPlayer < 0)
     throw nFault("You need two players");
@@ -31,25 +30,22 @@ Game::Game(const glm::ivec2& win, int numberPlayer, int numberIA, std::string co
   _currentMap = new Map(mapName);
   Placement place(_currentMap);
 
-  i = 0;
-  while (i < numberIA)
-    {
-      _listIA.push_back(new Ia(_currentMap, place.getNewPos(), algoFileName));
-      i++;
-    }
-
-  i = 0;
-  while (i < numberPlayer)
+  for (int i = 0; i < numberPlayer; ++i)
     {
       _players.push_back(new Player(place.getNewPos(), _currentMap));
-      i++;
     }
-  for (std::vector<Ia *>::iterator it = _listIA.begin() ; it != _listIA.end(); ++it)
-    if (_currentMap->addEntity(*it) != true)
-      throw nFault("Error in the initializiation of the map");
-  for (std::vector<Player *>::iterator it = _players.begin() ; it != _players.end(); ++it)
-    if (_currentMap->addEntity(*it) != true)
-      throw nFault("Error in the initializiation of the map");
+
+  for (int i = 0; i < numberIA; ++i)
+    {
+      _players.push_back(new Ia(_currentMap, place.getNewPos(), algoFileName));
+    }
+
+  // for (std::vector<Ia *>::iterator it = _listIA.begin() ; it != _listIA.end(); ++it)
+  //   if (_currentMap->addEntity(*it) != true)
+  //     throw nFault("Error in the initializiation of the map");
+  // for (std::vector<Player *>::iterator it = _players.begin() ; it != _players.end(); ++it)
+  //   if (_currentMap->addEntity(*it) != true)
+  //     throw nFault("Error in the initializiation of the map");
 
 
   init(win);
@@ -90,12 +86,36 @@ Game::~Game()
 bool Game::updateGame(gdl::Input &input, const gdl::Clock &clock)
 {
   std::list<Map::iterator> listMapToDelete;
+
+  // update map entity
   for (Map::iterator it = _currentMap->begin(); it != _currentMap->end(); ++it) {
       (*it)->update(input, clock);
+
+      for (std::vector<APlayer *>::iterator p = _players.begin(), pend = _players.end();
+      	   p != pend; ++p)
+      	{
+      	  glm::vec2 posObject = (*it)->getPos();
+      	  APlayer *player = *p;
+
+      	  if ((posObject.x < player->getPos().x + 2
+      	       && posObject.x > player->getPos().x - 2
+      	       && posObject.y < player->getPos().y + 2
+      	       && posObject.y > player->getPos().y - 2))
+	    {
+	      player->addEntityAround(*it);
+	    }
+      	}
+
       if ((*it)->getStatus() == IEntity::DESTROY)
         listMapToDelete.push_back(it);
     }
 
+  for (std::vector<APlayer *>::const_iterator it = _players.begin(), end = _players.end();
+       it != end; ++it)
+    {
+      (*it)->update(input, clock);
+      (*it)->clearEntityAround();
+    }
   //Delete every elements which are DESTROYs
   while (!listMapToDelete.empty()) {
       delete *listMapToDelete.front();
@@ -149,7 +169,15 @@ void Game::drawGame(UNUSED gdl::Input &input, gdl::Clock const &clock)
       posObject = (*it)->getPos();
       if ((posObject.x < posPlayer.x + rayon && posObject.x > posPlayer.x - rayon && posObject.y < posPlayer.y + rayon && posObject.y > posPlayer.y - rayon))
         (*it)->draw(shader, clock);
+   }
+
+  // players drawing
+  for (std::vector<APlayer *>::const_iterator it = _players.begin(), end = _players.end();
+       it != end; ++it)
+    {
+      (*it)->draw(shader, clock);
     }
+
   drawGraphicObject(shader, clock);
 
  /* glViewport(_win.x / 2, 0, _win.x / 2, _win.y);
