@@ -17,10 +17,10 @@ Bomb::Bomb(APlayer *player, const glm::vec2 &pos, int lvl, Map *map) :
   // _lastPos.push_back(_vec);
   // _lastPos.push_back(_vec);
 
-  _lastPosUp = _vec;
-  _lastPosDown = _vec;
-  _lastPosLeft = _vec;
-  _lastPosRight = _vec;
+  // _lastPosUp = _vec;
+  // _lastPosDown = _vec;
+  // _lastPosLeft = _vec;
+  // _lastPosRight = _vec;
 
   _fireList.push_back(new Fire(_vec));
 }
@@ -61,13 +61,13 @@ void	Bomb::explode(gdl::Clock const &clock)
   // this->spreadRight();
 
   std::cout << "UP" << std::endl;
-  _lastPosUp = this->spread(glm::vec2(0.0,1.0), _lastPosUp, _distance);
+  this->spread(glm::ivec2(0,1));
   std::cout << "LEFT" << std::endl;
-  _lastPosLeft = this->spread(glm::vec2(1.0,0.0), _lastPosLeft, _distance);
+  this->spread(glm::ivec2(1,0));
   std::cout << "DOWN" << std::endl;
-  _lastPosDown = this->spread(glm::vec2(0.0,-1.0), _lastPosDown, _distance);
+  this->spread(glm::ivec2(0,-1));
   std::cout << "RIGHT" << std::endl;
-  _lastPosRight = this->spread(glm::vec2(-1.0,0.0), _lastPosRight, _distance);
+  this->spread(glm::ivec2(-1,0));
 
   if (_status != DESTROY && _totalDistance >= _range) {
       _status = DESTROY;
@@ -92,28 +92,28 @@ bool	Bomb::destroyEntity(int x, int y) const
   return true;
 }
 
-glm::vec2	Bomb::spread(glm::vec2 dir, glm::vec2 lastPos, double distance)
+bool	Bomb::spread(glm::ivec2 dir)
 {
   // to go
-  glm::vec2 maxPos, newPos;
+  glm::ivec2 maxPos, newPos;
 
-  maxPos = _vec + (_range * dir);
-  newPos = lastPos;
+  if (_distance >= _range)
+    _distance = _range;
 
-  while (newPos != maxPos && distance > 1.0)
+  maxPos = glm::ivec2(_vec) + (static_cast<int>(_distance + 1) * dir);
+  newPos = glm::ivec2(_vec);
+
+  do
     {
+      if (!this->destroyEntity(newPos.x, newPos.y))
+	return false;
+      std::cout << "newposx : " << newPos.x << " - newPosy : " << newPos.y << std::endl;
+      _fireList.push_back(new Fire(glm::vec2(newPos)));
 
       newPos += dir;
-
-      if (!this->destroyEntity(newPos.x, newPos.y))
-      	break;
-
-      std::cout << "newposx : " << newPos.x << " - newPosy : " << newPos.y << std::endl;
-      _fireList.push_back(new Fire(newPos));
-
-      distance -= 1.0;
     }
-  return newPos;
+  while (newPos != maxPos);
+  return true;
 }
 
 bool	Bomb::spreadTop()
@@ -182,15 +182,15 @@ void	Bomb::draw(gdl::AShader *shader, const gdl::Clock& clock)
     _obj->draw(shader, clock);
 
   // draw flames
-  // while (_status == BURNING && !_fireList.empty()) {
-  //     _fireList.front()->draw(shader, clock);
-  //     delete _fireList.front();
-  //     _fireList.pop_front();
-  //   }
-  for (std::list<Fire *>::iterator it = _fireList.begin(), end = _fireList.end(); it != end; ++it)
-    {
-      (*it)->draw(shader, clock);
+  while (_status == BURNING && !_fireList.empty()) {
+      _fireList.front()->draw(shader, clock);
+      delete _fireList.front();
+      _fireList.pop_front();
     }
+  // for (std::list<Fire *>::iterator it = _fireList.begin(), end = _fireList.end(); it != end; ++it)
+  //   {
+  //     (*it)->draw(shader, clock);
+  //   }
 }
 
 IEntity::Type Bomb::getType() const

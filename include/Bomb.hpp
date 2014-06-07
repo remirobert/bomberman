@@ -28,7 +28,6 @@ private:
   IEntity::Status _status;
   int _speed;
   double _distance, _totalDistance;
-  glm::vec2 _lastPosUp, _lastPosDown, _lastPosLeft, _lastPosRight;
 
 public:
   Bomb(APlayer *player, const glm::vec2 &pos, int lvl, Map *map);
@@ -45,7 +44,7 @@ private:
   void	explode(gdl::Clock const &clock);
   bool	destroyEntity(int x, int y) const;
 
-  glm::vec2 spread(glm::vec2 dir, glm::vec2 lastPos, double distance);
+  bool	spread(glm::ivec2 dir);
   bool	spreadTop();
   bool	spreadLeft();
   bool	spreadDown();
