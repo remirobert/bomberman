@@ -28,11 +28,11 @@ SRC		=	main.cpp \
 			OrthoCam.cpp \
 			FontText.cpp \
 			EntitiesFactory.cpp \
-			AssetsManager.cpp \
 			Pan.cpp \
 			Ground.cpp \
 			Placement.cpp \
 			APlayer.cpp \
+			PlayerManager.cpp \
 			Model.cpp \
 			PivotingCam.cpp \
 			Light.cpp \
@@ -40,8 +40,18 @@ SRC		=	main.cpp \
 			SkyBox.cpp \
 			SoundManager.cpp \
 			Sound.cpp \
+			SharedPointer.cpp \
 			Timer.cpp \
-			Fire.cpp
+			TextureLoader.cpp \
+			ModelLoader.cpp \
+			ReferenceCounter.cpp \
+			Helper.cpp \
+			AResource.cpp \
+			Texture.cpp \
+			MediaManager.cpp \
+			ResourceManager.cpp \
+			Fire.cpp \
+			PreLoader.cpp
 
 CC		=	g++
 

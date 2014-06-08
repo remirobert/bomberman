@@ -1,14 +1,13 @@
 #include "config.h"
 #include "Player.hpp"
 
-Player::Player(const glm::vec2 pos, Map *map) : APlayer(pos, map)
+Player::Player(const glm::vec2& pos, Map *map) : APlayer(pos, map)
 {
-  _statusOfObject = OK;
-
   for (size_t i = 0; i < _stock; ++i) {
       _bombList.push_back(_lvl);
-  }
+    }
 }
+
 
 Player::~Player()
 {
@@ -33,13 +32,12 @@ void	Player::update(gdl::Input &input, gdl::Clock const &clock)
 	}
     }
   updateAnim(hasMoved, validKey);
-
   for (actionPtr::iterator it = _actionPtr.begin(); it != _actionPtr.end(); ++it)
     {
       if (input.getKey(it->first))
-	{
-	  (this->*_actionPtr[it->first])();
-	  return;
-	}
+        {
+          (this->*_actionPtr[it->first])();
+          return;
+        }
     }
 }

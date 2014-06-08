@@ -1,7 +1,8 @@
 #include "APlayer.hpp"
 # include "Bomb.hpp"
 
-APlayer::APlayer(const glm::vec2 &pos, Map *map) : _pos(pos), _map(map), _time(2)
+APlayer::APlayer(const glm::vec2 &pos, Map *map)
+  : _pos(pos), _map(map), _time(2)
 {
   _stock = 1;
 
@@ -10,8 +11,9 @@ APlayer::APlayer(const glm::vec2 &pos, Map *map) : _pos(pos), _map(map), _time(2
   _obj->translate(glm::vec3(pos.x, -0.5, pos.y));
   _obj->scale(glm::vec3(0.0025, 0.0025, 0.0025));
 
+  _statusOfObject = OK;
   _status = STANDBY;
-  _speed = 4;
+  _speed = 3;
   _way = UP;
   _size = 0.7;
   _lvl = 1;
@@ -29,24 +31,34 @@ APlayer::APlayer(const glm::vec2 &pos, Map *map) : _pos(pos), _map(map), _time(2
   _actionPtr[SDLK_SPACE] = &APlayer::bomb;
 
   _moveConf[SDLK_UP] = new movementCoef(0, glm::vec2(0.0, 1.0),
-					glm::vec3(0, 0, 1),
-					glm::vec2(0.7, 0.7), glm::vec2(0.2, 0.7));
+                                        glm::vec3(0, 0, 1),
+                                        glm::vec2(0.7, 0.7),
+                                        glm::vec2(0.2, 0.7));
 
   _moveConf[SDLK_DOWN] = new movementCoef(180, glm::vec2(0.0, -1.0),
-					  glm::vec3(0, 0, -1),
-					  glm::vec2(0.7, 0.2), glm::vec2(0.2, 0.2));
+                                          glm::vec3(0, 0, -1),
+                                          glm::vec2(0.7, 0.2),
+                                          glm::vec2(0.2, 0.2));
 
   _moveConf[SDLK_RIGHT] = new movementCoef(-90, glm::vec2(-1.0, 0.0),
-					   glm::vec3(-1, 0, 0),
-					   glm::vec2(0.2, 0.7), glm::vec2(0.2, 0.2));
+      glm::vec3(-1, 0, 0),
+      glm::vec2(0.2, 0.7),
+      glm::vec2(0.2, 0.2));
 
   _moveConf[SDLK_LEFT] = new movementCoef(90, glm::vec2(1.0, 0.0),
-					  glm::vec3(1, 0, 0),
-					  glm::vec2(0.7, 0.7), glm::vec2(0.7, 0.2));
+                                          glm::vec3(1, 0, 0),
+                                          glm::vec2(0.7, 0.7),
+                                          glm::vec2(0.7, 0.2));
 }
 
 APlayer::~APlayer()
 {
+  delete _obj;
+  for (std::map<int, movementCoef*>::iterator it = _moveConf.begin();
+       it != _moveConf.end(); ++it)
+    {
+      delete it->second;
+    }
 }
 
 const glm::vec2	&APlayer::getPos() const
@@ -59,7 +71,7 @@ void	APlayer::setPos(const glm::vec2 &new_pos)
   _pos = new_pos;
 }
 
-void	APlayer::draw(gdl::AShader *shader, const gdl::Clock& clock)
+void	APlayer::draw(gdl::AShader *shader, const gdl::Clock& clock) const
 {
   _obj->draw(shader, clock);
 }
@@ -71,7 +83,7 @@ bool	APlayer::movePlayer(const movementCoef *mcoef, float const distance)
   bool	hasMoved = false;
 
   // reset rotation
-  _obj->setRotation(glm::vec3(0,0,0));
+  _obj->setRotation(glm::vec3(0, 0, 0));
   _obj->rotate(glm::vec3(0, 1, 0), mcoef->rotate);
 
   // get point to go left end right in front the player
@@ -98,10 +110,10 @@ void	APlayer::updateAnim(bool hasMoved, bool keyPressed)
   if (keyPressed == false)
     {
       if (_status == WALK)
-	{
-	  _obj->setCurrentSubAnim("stop_walking", false);
-	  _status = STOP_WALK;
-	}
+        {
+          _obj->setCurrentSubAnim("stop_walking", false);
+          _status = STOP_WALK;
+        }
       return;
     }
   if (_status != WALK && hasMoved)
@@ -125,17 +137,13 @@ bool APlayer::bomb()
 {
   int x = _pos.x + _size;
   int y = _pos.y + _size;
-  static int prevX = 0;
-  static int prevY = 0;
 
-  if (prevX == x && prevY == y)
+  if (_map->getTypeAt(x, y) != NONE)
     return false;
   if (!_bombList.empty()) {
       _map->addEntity(new Bomb(this, glm::vec2(x, y), _bombList.front(), _map));
       _bombList.pop_front();
-      prevX = x;
-      prevY = y;
-  }
+    }
   return false;
 }
 
@@ -168,3 +176,4 @@ void APlayer::setStatus(IEntity::Status status)
 {
   _statusOfObject = status;
 }
+

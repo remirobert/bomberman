@@ -150,9 +150,6 @@ void *Ia::init()
       std::cerr << e.what() << std::endl;
     }
   _running = false;
-  _mutex.lock();
-  _condAct.notifyAll();
-  _mutex.unlock();
   return NULL;
 }
 
@@ -170,7 +167,6 @@ int Ia::exec()
     {
       _mutex.lock();
       _condAct.notifyAll();
-      _condAct.wait();/* TODO : change that */
       _mutex.unlock();
     }
   return _act;
@@ -180,16 +176,11 @@ void Ia::action(int act)
 {
   _act = act;
   _mutex.lock();
-  if (_act != -1)
-    _condAct.notifyAll();
   _condAct.wait();
   _mutex.unlock();
   if (_dead)
     {
       _running = false;
-      _mutex.lock();
-      _condAct.notifyAll();
-      _mutex.unlock();
       pthread_exit(&act);
     }
 }
@@ -226,23 +217,23 @@ void Ia::update(UNUSED gdl::Input &input, gdl::Clock const &clock)
 
       // si le key est pour move
       if (sdlKeyMove != _moveConf.end())
-	{
-	  hasMoved = movePlayer(_moveConf[key->second], distance);
-	  updateAnim(hasMoved);
-	  return;
-	}
+        {
+          hasMoved = movePlayer(_moveConf[key->second], distance);
+          updateAnim(hasMoved);
+          return;
+        }
       else
-	{
-	  // sinon on check dans le tableau de ptointeur sur fonction
-	  for (actionPtr::iterator it = _actionPtr.begin(); it != _actionPtr.end(); ++it)
-	    {
-	      if (it->first == sdlKey)
-		{
-		  (this->*_actionPtr[sdlKey])();
-		  return;
-		}
-	    }
-	}
+        {
+          // sinon on check dans le tableau de ptointeur sur fonction
+          for (actionPtr::iterator it = _actionPtr.begin(); it != _actionPtr.end(); ++it)
+            {
+              if (it->first == sdlKey)
+                {
+                  (this->*_actionPtr[sdlKey])();
+                  return;
+                }
+            }
+        }
     }
 }
 

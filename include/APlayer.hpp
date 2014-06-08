@@ -1,5 +1,5 @@
 #ifndef APLAYER_HPP_
-#define APLAYER_HPP_
+# define APLAYER_HPP_
 
 # include "IEntity.hpp"
 # include "Model.hpp"
@@ -74,11 +74,11 @@ public:
 
 public:
   virtual const glm::vec2 &getPos() const;
-  virtual void  setPos(const glm::vec2 &new_pos);
-  virtual void  update(gdl::Input &input, gdl::Clock const &clock) = 0;
-  virtual void  draw(gdl::AShader *shader, const gdl::Clock& clock);
+  virtual void setPos(const glm::vec2 &new_pos);
+  virtual void update(gdl::Input &input, gdl::Clock const &clock) = 0;
+  virtual void draw(gdl::AShader *shader, const gdl::Clock& clock) const;
   virtual IEntity::Type getType() const;
-  virtual void  setStatus(APlayer::Status);
+  virtual void setStatus(APlayer::Status);
   virtual IEntity::Status getStatus() const;
   virtual void setStatus(IEntity::Status status);
   virtual void	addEntityAround(const IEntity *entity);

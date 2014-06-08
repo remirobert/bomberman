@@ -12,7 +12,7 @@ Placement::~Placement()
 {
 }
 
-glm::ivec2 const Placement::genNewPos()
+glm::ivec2 Placement::genNewPos()
 {
   _numberPlayer++;
   switch (_numberPlayer)
@@ -27,21 +27,21 @@ glm::ivec2 const Placement::genNewPos()
       return glm::ivec2(0, _mapSize.y);
     default:
       switch (_numberPlayer % 5)
-	{
-	case 0:
-	  return glm::ivec2(_mapSize.x / _div, 0);
-	case 1:
-	  return glm::ivec2(0, _mapSize.y / _div);
-	case 2:
-	  return glm::ivec2(_mapSize.x / _div, _mapSize.y);
-	case 3:
-	  return glm::ivec2(_mapSize.x, _mapSize.y / _div);
-	default:
-	  {
-	    _div *= 2;
-	    return glm::ivec2(_mapSize.x / _div, _mapSize.y / _div);
-	  }
-	}
+        {
+        case 0:
+          return glm::ivec2(_mapSize.x / _div, 0);
+        case 1:
+          return glm::ivec2(0, _mapSize.y / _div);
+        case 2:
+          return glm::ivec2(_mapSize.x / _div, _mapSize.y);
+        case 3:
+          return glm::ivec2(_mapSize.x, _mapSize.y / _div);
+        default:
+        {
+          _div *= 2;
+          return glm::ivec2(_mapSize.x / _div, _mapSize.y / _div);
+        }
+        }
     }
 }
 
@@ -62,7 +62,7 @@ bool Placement::checkSpace(glm::ivec2 const &pos, glm::ivec2 const &back, int re
   return false;
 }
 
-glm::ivec2 const Placement::foundCloserGoodPlace(glm::ivec2 const &pos)
+glm::ivec2 Placement::foundCloserGoodPlace(glm::ivec2 const &pos)
 {
   int rayon = 1;
 
@@ -71,27 +71,27 @@ glm::ivec2 const Placement::foundCloserGoodPlace(glm::ivec2 const &pos)
   while (rayon < _mapSize.x || rayon < _mapSize.y)
     {
       if (checkSpace(glm::ivec2(pos.x - rayon, pos.y - rayon), glm::ivec2(pos.x - rayon, pos.y - rayon), 2))
-	return glm::ivec2(pos.x - rayon, pos.y - rayon);
+        return glm::ivec2(pos.x - rayon, pos.y - rayon);
       if (checkSpace(glm::ivec2(pos.x, pos.y - rayon), glm::ivec2(pos.x, pos.y - rayon), 2))
-	return glm::ivec2(pos.x, pos.y - rayon);
+        return glm::ivec2(pos.x, pos.y - rayon);
       if (checkSpace(glm::ivec2(pos.x + rayon, pos.y - rayon), glm::ivec2(pos.x + rayon, pos.y - rayon), 2))
-	return glm::ivec2(pos.x + rayon, pos.y - rayon);
+        return glm::ivec2(pos.x + rayon, pos.y - rayon);
       if (checkSpace(glm::ivec2(pos.x - rayon, pos.y), glm::ivec2(pos.x - rayon, pos.y), 2))
-	return glm::ivec2(pos.x - rayon, pos.y);
+        return glm::ivec2(pos.x - rayon, pos.y);
       if (checkSpace(glm::ivec2(pos.x + rayon, pos.y), glm::ivec2(pos.x + rayon, pos.y), 2))
-	return glm::ivec2(pos.x + rayon, pos.y);
+        return glm::ivec2(pos.x + rayon, pos.y);
       if (checkSpace(glm::ivec2(pos.x - rayon, pos.y + rayon), glm::ivec2(pos.x - rayon, pos.y + rayon), 2))
-	return glm::ivec2(pos.x - rayon, pos.y + rayon);
+        return glm::ivec2(pos.x - rayon, pos.y + rayon);
       if (checkSpace(glm::ivec2(pos.x, pos.y + rayon), glm::ivec2(pos.x, pos.y + rayon), 2))
-	return glm::ivec2(pos.x, pos.y + rayon);
+        return glm::ivec2(pos.x, pos.y + rayon);
       if (checkSpace(glm::ivec2(pos.x + rayon, pos.y + rayon), glm::ivec2(pos.x + rayon, pos.y + rayon), 2))
-	return glm::ivec2(pos.x + rayon, pos.y + rayon);
+        return glm::ivec2(pos.x + rayon, pos.y + rayon);
       rayon++;
     }
   throw nFault("No space available on the map for all players");
 }
 
-glm::vec2 const Placement::getNewPos()
+glm::vec2 Placement::getNewPos()
 {
   glm::ivec2 new_pos = genNewPos();
   new_pos = foundCloserGoodPlace(new_pos);
