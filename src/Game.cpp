@@ -35,7 +35,7 @@ Game::Game(const glm::ivec2& win, int numberPlayer, int numberIA, std::string co
     throw nFault("You need two players");
 
   if (mapName == "")
-    _currentMap = new Map(100, 100);
+    _currentMap = new Map(glm::ivec2(100, 100));
   else
     _currentMap = new Map(mapName);
 
@@ -69,7 +69,7 @@ Game::Game(const glm::ivec2& win, int numberPlayer, int numberIA, std::string co
 void Game::init(const glm::ivec2& win)
 {
   glm::vec2 mapDim = _currentMap->getDimension();
-  _ogl.init(win, glm::ivec2(mapDim.x, mapDim.y), (_players.size() == 2));
+  _ogl.init(win, mapDim, (_players.size() == 2));
 }
 
 Game::~Game()

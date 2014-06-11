@@ -5,42 +5,38 @@
 /*
 ** constructor random map
 */
-Map::Map(const int x, const int y)
-  : _dim(x, y)
+
+Map::Map(const glm::ivec2& dim)
+  : _dim(dim)
 {
   _charToIEntity[IEntity::S_BOX] = IEntity::BOX;
   _charToIEntity[IEntity::S_WALL] = IEntity::WALL;
   _charToIEntity[IEntity::S_NONE] = IEntity::NONE;
-  this->loadRandomMap();
+  loadRandomMap();
 }
 
 /*
 ** constructor map with fileName
 */
 Map::Map(std::string const &mapFileName)
-  : _dim(0, 0)
+  : _dim(glm::ivec2(0, 0))
 {
   _charToIEntity[IEntity::S_BOX] = IEntity::BOX;
   _charToIEntity[IEntity::S_WALL] = IEntity::WALL;
   _charToIEntity[IEntity::S_NONE] = IEntity::NONE;
-  this->loadMapFromFile(mapFileName);
+  loadMapFromFile(mapFileName);
 }
 
 Map::~Map()
 {
-  IEntity	*entity;
 
-  while (!_map.empty()) {
-      entity = *(_map.begin());
-      delete entity;
-      _map.pop_front();
-    }
 }
 
 /*
 ** Private Methods
 */
-IEntity::Type	Map::getType(const char c) const
+
+IEntity::Type	Map::getType(char c) const
 {
   IEntity::Type type = IEntity::NONE;
 
@@ -57,7 +53,7 @@ IEntity::Type	Map::getType(const char c) const
 
 bool		Map::loadMapFromFile(std::string const &fileName)
 {
-  std::ifstream	file(fileName.c_str());
+  std::ifstream file(fileName.c_str());
 
   if (!file.is_open())
     {
@@ -65,8 +61,8 @@ bool		Map::loadMapFromFile(std::string const &fileName)
       return false;
     }
 
-  std::string	line;
-  int		x = 0, y = 0;
+  std::string line;
+  int x = 0, y = 0;
   IEntity	*entity;
 
   while (std::getline(file, line)) {
@@ -103,12 +99,12 @@ void		Map::loadRandomMap()
       }
 }
 
-IEntity		*Map::getEntityForMap(const int x, const int y, const IEntity::Type i) const
+IEntity *Map::getEntityForMap(const glm::ivec2& pos, const IEntity::Type i) const
 {
   IEntity	*entity = NULL;
 
   if (i != IEntity::NONE)
-    entity = EntitiesFactory::getInstance()->create(i, x, y);
+    entity = EntitiesFactory::getInstance()->create(i, pos.x, pos.y);
   return entity;
 }
 
@@ -144,31 +140,7 @@ void	Map::displayDebugMap() const
     }
 }
 
-/*
-** Public methods
-*/
-
-Map::LMap	&Map::getMap()
-{
-  return _map;
-}
-
-Map::LMap	&Map::getUpdateMap()
-{
-  return _updateList;
-}
-
-// int	Map::getWidth() const
-// {
-//   return _x;
-// }
-
-// int	Map::getLength() const
-// {
-//   return _y;
-// }
-
-const glm::vec2 &Map::getDimension() const
+const glm::ivec2 &Map::getDimension() const
 {
   return _dim;
 }
@@ -177,15 +149,15 @@ const glm::vec2 &Map::getDimension() const
 ** Return a pointer, or not, on an IEntity if there is one at coord(x, y)
 */
 
-IEntity		*Map::getEntityAt(const int x, const int y) const
+IEntity		*Map::getEntityAt(const glm::ivec2& pos) const
 {
   for (LMap::const_iterator it = _map.begin(), end = _map.end(); it != end; ++it)
-    if ((*(*it)).getPos().x == x && (*(*it)).getPos().y == y)
+    if ((*(*it)).getPos() == pos)
       return *it;
   return NULL;
 }
 
-std::vector<APlayer *> const Map::getPlayersAt(const int x, const int y) const
+std::vector<APlayer *> Map::getPlayersAt(const glm::ivec2& pos) const
 {
   int x1, y1;
   std::vector<APlayer *> entity;
@@ -195,25 +167,26 @@ std::vector<APlayer *> const Map::getPlayersAt(const int x, const int y) const
       x1 = (*it)->getPos().x + 0.7;
       y1 = (*it)->getPos().y + 0.7;
       if (x1 == x && y1 == y)
-	entity.push_back(static_cast<APlayer *>(*it));
+        entity.push_back(static_cast<APlayer *>(*it));
       x1 = (*it)->getPos().x + 0.3;
       y1 = (*it)->getPos().y + 0.3;
       if (x1 == x && y1 == y)
-	entity.push_back(static_cast<APlayer *>(*it));
+        entity.push_back(static_cast<APlayer *>(*it));
     }
   return entity;
 }
 
 /*
-** Return the Type of an Entity at coor(x, y)
+** Return the Type of an Entity at pos
 */
 
-IEntity::Type	Map::getTypeAt(const int x, const int y) const
+IEntity::Type	Map::getTypeAt(const glm::ivec2& pos) const
 {
   IEntity::Type type = IEntity::NONE;
 
   for (LMap::const_iterator it = _map.begin(), end = _map.end(); it != end; ++it)
-    if (static_cast<int>((*(*it)).getPos().x) == x && static_cast<int>((*(*it)).getPos().y) == y) {
+    if ((*(*it)).getPos() == pos)
+      {
         type = (*it)->getType();
         if (type == IEntity::PLAYER)
           type = IEntity::NONE;
@@ -223,16 +196,11 @@ IEntity::Type	Map::getTypeAt(const int x, const int y) const
   return type;
 }
 
-Map::LMap		&Map::getPlayerList()
-{
-  return _playerList;
-}
-
 /*
 ** Add an entity in the map if it's possible, else return false
 */
 
-bool		Map::addEntity(IEntity *entity)
+bool Map::addEntity(IEntity *entity)
 {
   if (entity->getType() != IEntity::PLAYER)
     _map.push_back(entity);
@@ -245,79 +213,21 @@ bool		Map::addEntity(IEntity *entity)
 }
 
 /*
-** Delete an entity in the map at coord(x, y) if it's possible, else return false
+** Delete an entity in the map at pos if it's possible, else return false
 */
 
-bool	Map::deleteEntityAt(const int x, const int y)
+bool	Map::deleteEntityAt(const glm::ivec2& pos)
 {
-  IEntity	*entity;
+  IEntity *entity;
 
   for (LMap::iterator it = _map.begin(); it != _map.end(); ++it)
-    if ((*(*it)).getPos().x == x && (*(*it)).getPos().y == y) {
-        entity = *it;
-        delete entity;
-        _map.erase(it);
-        return true;
-      }
+    {
+      if ((*(*it)).getPos().x == x && (*(*it)).getPos().y == y) {
+          entity = *it;
+          delete entity;
+          _map.erase(it);
+          return true;
+        }
+    }
   return false;
-}
-
-Map::iterator	Map::begin()
-{
-  return _map.begin();
-}
-
-Map::const_iterator	Map::begin() const
-{
-  return _map.begin();
-}
-
-Map::iterator	Map::playerBegin()
-{
-  return _playerList.begin();
-}
-
-Map::const_iterator	Map::playerBegin() const
-{
-  return _playerList.begin();
-}
-
-Map::iterator	Map::updateBegin()
-{
-  return _updateList.begin();
-}
-
-Map::const_iterator	Map::updateBegin() const
-{
-  return _updateList.begin();
-}
-
-Map::iterator	Map::end()
-{
-  return _map.end();
-}
-
-Map::const_iterator	Map::end() const
-{
-  return _map.end();
-}
-
-Map::iterator	Map::playerEnd()
-{
-  return _playerList.end();
-}
-
-Map::const_iterator	Map::playerEnd() const
-{
-  return _playerList.end();
-}
-
-Map::iterator	Map::updateEnd()
-{
-  return _updateList.end();
-}
-
-Map::const_iterator	Map::updateEnd() const
-{
-  return _updateList.end();
 }

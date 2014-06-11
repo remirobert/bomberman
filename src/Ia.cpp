@@ -211,7 +211,7 @@ const glm::vec2& Ia::getPos() const
   return _pos;
 }
 
-const glm::vec2& Ia::getMapDimension() const
+const glm::ivec2& Ia::getMapDimension() const
 {
   return _map->getDimension();
 }

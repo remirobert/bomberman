@@ -44,7 +44,7 @@ public:
   void action(int act);
   void *init();
   bool nothing(UNUSED double const distance);
-  const glm::vec2& getMapDimension() const;
+  const glm::ivec2& getMapDimension() const;
 
 public:
   template<class Archive>

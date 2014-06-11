@@ -4,6 +4,7 @@
 # include <stdexcept>
 # include <string>
 # include <list>
+# include <vector>
 # include <iostream>
 # include <cstdlib>
 # include <ctime>
@@ -25,46 +26,29 @@ class APlayer;
 class Map
 {
   friend class boost::serialization::access;
-
-public:
-  typedef std::list<IEntity *> LMap;
-  typedef std::list<IEntity *>::iterator iterator;
-  typedef std::list<IEntity *>::const_iterator const_iterator;
+private:
+  typedef std::list<IEntity*> dynamMap;
+  typedef std::vector<IEntity*> staticMap;
 
 private:
-  // int		_x;
-  // int		_y;
-  glm::vec2	_dim;
-  LMap		_map;
-  LMap		_playerList;
-  LMap		_updateList;
-  std::map<char, IEntity::Type>	_charToIEntity;
+  glm::ivec2 _dim;
+
+  std::vector<IEntity*> _map;
+  std::list<IEntity*> _updateList;
+
+  std::map<char, IEntity::Type> _charToIEntity;
 
 public:
-  Map(const int x, const int y);
+  Map(const glm::ivec2& dim);
   Map(std::string const &mapFileName);
   ~Map();
-  Map::LMap	&getMap();
-  Map::LMap	&getUpdateMap();
-  const glm::vec2 &getDimension() const;
-  IEntity	*getEntityAt(const int x, const int y) const;
-  std::vector<APlayer *> const getPlayersAt(const int x, const int y) const;
-  bool		addEntity(IEntity *entity);
-  bool		deleteEntityAt(const int x, const int y);
-  IEntity::Type	getTypeAt(const int x, const int y) const;
-  Map::LMap	&getPlayerList();
-  Map::iterator	begin();
-  Map::const_iterator	begin() const;
-  Map::iterator	playerBegin();
-  Map::const_iterator	playerBegin() const;
-  Map::iterator	updateBegin();
-  Map::const_iterator	updateBegin() const;
-  Map::iterator	end();
-  Map::const_iterator	end() const;
-  Map::iterator	playerEnd();
-  Map::const_iterator	playerEnd() const;
-  Map::iterator	updateEnd();
-  Map::const_iterator	updateEnd() const;
+
+  const glm::ivec2 &getDimension() const;
+  IEntity *getEntityAt(const glm::ivec2& pos) const;
+  std::vector<APlayer *> getPlayersAt(const glm::ivec2& pos) const;
+  bool addEntity(IEntity *entity);
+  bool deleteEntityAt(const glm::ivec2& pos);
+  IEntity::Type getTypeAt(const glm::ivec2& pos) const;
 
 public:
   template<class Archive>
@@ -101,14 +85,14 @@ public:
   }
 
 private:
-  bool		loadMapFromFile(std::string const &fileName);
-  void		loadRandomMap();
-  IEntity::Type	getType(const char c) const;
-  IEntity	*getEntityForMap(const int x, const int y, const IEntity::Type i) const;
+  bool loadMapFromFile(std::string const &fileName);
+  void loadRandomMap();
+  IEntity::Type getType(char c) const;
+  IEntity *getEntityForMap(const glm::ivec2& pos, IEntity::Type i) const;
 
   //Debug methods
 public:
-  void	displayDebugMap() const;
+  void displayDebugMap() const;
 };
 
 #endif /* !MAP_HPP_ */
