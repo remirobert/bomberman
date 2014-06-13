@@ -51,34 +51,34 @@ public:
   template<class Archive>
   void serialize(Archive & ar, UNUSED const unsigned int version)
   {
-//    ar & _dim.x;
-//    ar & _dim.y;
-//    for (LMap::iterator it = _map.begin(), end = _map.end();
-//    	 it != end; it++)
-//      {
-//    	int type = static_cast<int>((*it)->getType());
-//    	int status = static_cast<int>((*it)->getStatus());
-//	float x = ((*it)->getPos()).x;
-//	float y = ((*it)->getPos()).y;
-//
-//    	ar & x;
-//	ar & y;
-//    	ar & type;
-//    	ar & status;
-//      }
-//    for (LMap::iterator it = _playerList.begin(), end = _playerList.end();
-//    	 it != end; it++)
-//      {
-//    	int type = static_cast<int>((*it)->getType());
-//    	int status = static_cast<int>((*it)->getStatus());
-//	float x = ((*it)->getPos()).x;
-//	float y = ((*it)->getPos()).y;
-//
-//    	ar & x;
-//	ar & y;
-//    	ar & type;
-//    	ar & status;
-//      }
+    ar & _dim.x;
+    ar & _dim.y;
+    for (std::vector<IEntity*>::const_iterator it = _map.begin(), end = _map.end();
+         it != end; it++)
+      {
+        int type = static_cast<int>((*it)->getType());
+        int status = static_cast<int>((*it)->getStatus());
+        float x = ((*it)->getPos()).x;
+        float y = ((*it)->getPos()).y;
+
+        ar & x;
+        ar & y;
+        ar & type;
+        ar & status;
+      }
+    for (std::list<IEntity*>::const_iterator it = _updateList.begin(), end = _updateList.end();
+         it != end; it++)
+      {
+        int type = static_cast<int>((*it)->getType());
+        int status = static_cast<int>((*it)->getStatus());
+        float x = ((*it)->getPos()).x;
+        float y = ((*it)->getPos()).y;
+
+        ar & x;
+        ar & y;
+        ar & type;
+        ar & status;
+      }
   }
 
 private:
