@@ -84,8 +84,8 @@ bool	APlayer::movePlayer(const movementCoef *mcoef, float const distance)
       _obj->translate(mcoef->translate * distance);
       return true;
     }
-  IEntity *left = _map->getEntityAt(toGoLeft.x, toGoLeft.y);
-  IEntity *right = _map->getEntityAt(toGoRight.x, toGoRight.y);
+  IEntity *left = _map->getEntityAt(glm::ivec2(toGoLeft));
+  IEntity *right = _map->getEntityAt(glm::ivec2(toGoRight));
 
   if (left && left->getType() == IEntity::BONUS
       && left->getStatus() != IEntity::REMOVE
@@ -152,7 +152,8 @@ bool APlayer::bomb()
   int x = _pos.x + _size;
   int y = _pos.y + _size;
 
-  if (_map->getTypeAt(x, y) != NONE)
+   glm::ivec2 pos(x, y);
+  if (_map->getTypeAt(pos) != NONE)
     return false;
   if (_stock_bomb > 0)
     {

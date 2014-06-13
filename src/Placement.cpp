@@ -18,7 +18,7 @@ glm::ivec2 Placement::genNewPos()
 
 bool Placement::checkSpace(glm::ivec2 const &pos, glm::ivec2 const &back, int rec)
 {
-  if (pos.x < 0 || pos.y < 0 || pos.x >= _mapSize.x || pos.y >= _mapSize.y || _map->getTypeAt(pos.x, pos.y) != IEntity::NONE || _map->getPlayersAt(pos.x, pos.y).size() != 0)
+  if (pos.x < 0 || pos.y < 0 || pos.x >= _mapSize.x || pos.y >= _mapSize.y || _map->getTypeAt(pos) != IEntity::NONE || _map->getPlayersAt(pos).size() != 0)
     return false;
   if (rec == 0)
     return true;

@@ -40,15 +40,16 @@ void PlayerManager::updateNearList(const Map& map)
   glm::vec2 posObject(0, 0);
   int rayon = 17;
 
-  for (Map::const_iterator it = map.begin(), end = map.end();
-       it != end; ++it)
-    {
-      posObject = (*it)->getPos();
-      if ((posObject.x < posPlayer.x + rayon && posObject.x > posPlayer.x - rayon && posObject.y < posPlayer.y + rayon && posObject.y > posPlayer.y - rayon))
-        _nearEntity.push_front((*it));
-    }
+//  for (Map::const_iterator it = map.begin(), end = map.end();
+//       it != end; ++it)
+//    {
+//      posObject = (*it)->getPos();
+//      if ((posObject.x < posPlayer.x + rayon && posObject.x > posPlayer.x - rayon && posObject.y < posPlayer.y + rayon && posObject.y > posPlayer.y - rayon))
+//        _nearEntity.push_front((*it));
+//    }
 
-  for (Map::const_iterator it = map.playerBegin(), end = map.playerEnd();
+  Map::UMap uList = map.getUpdateList();
+  for (Map::const_iterator it = uList.begin(), end = uList.end();
        it != end; ++it)
     {
       posObject = (*it)->getPos();

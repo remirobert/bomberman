@@ -89,8 +89,8 @@ void		Map::loadRandomMap()
   glm::ivec2 pos;
 
   _map.resize(_dim.x * _dim.y);
-  for (pos.x = 0; i < _dim.x; ++pos.x)
-    for (pos.y = 0; j < _dim.y; ++pos.y)
+  for (pos.x = 0; pos.x < _dim.x; ++pos.x)
+    for (pos.y = 0; pos.y < _dim.y; ++pos.y)
       {
         if (pos.x == 0 || pos.y == 0 || pos.x == _dim.x - 1 || pos.y == _dim.y - 1 || (pos.y % 2 == 0 && pos.x % 2 == 0))
           entity = getEntityForMap(pos, IEntity::WALL);
@@ -159,14 +159,15 @@ std::vector<APlayer *> Map::getPlayersAt(const glm::ivec2& pos) const
 
 IEntity::Type	Map::getTypeAt(const glm::ivec2& pos) const
 {
-  IEntity::Type type;
+  IEntity::Type type = IEntity::NONE;
   IEntity* ent;
 
   size_t posInArray = twoDToArray(pos);
   if (posInArray >= _map.size())
     return IEntity::NONE;
   ent = _map.at(posInArray);
-  type = ent->getType();
+  if (ent != NULL)
+    type = ent->getType();
   return (type == IEntity::PLAYER) ? IEntity::NONE : type;
 }
 
@@ -176,7 +177,7 @@ IEntity::Type	Map::getTypeAt(const glm::ivec2& pos) const
 
 bool Map::addEntity(IEntity *entity)
 {
-  glm::ivec2 pos = entity->getPos();
+  glm::ivec2 pos = glm::ivec2(entity->getPos().x, entity->getPos().y);
 
   if (entity->getType() == IEntity::WALL || entity->getType() == IEntity::BOX)
     _map[twoDToArray(pos)] = entity;
@@ -191,14 +192,13 @@ bool Map::addEntity(IEntity *entity)
 
 bool	Map::deleteEntityAt(const glm::ivec2& pos)
 {
-  IEntity::Type type;
   IEntity* ent;
 
   size_t posInArray = twoDToArray(pos);
   if (posInArray >= _map.size())
     return IEntity::NONE;
   ent = _map.at(posInArray);
-  delete entity;
+  delete ent;
   _map[posInArray] = NULL;
   return true;
 }
@@ -206,5 +206,15 @@ bool	Map::deleteEntityAt(const glm::ivec2& pos)
 size_t Map::twoDToArray(const glm::ivec2& pos) const
 {
   return pos.y * _dim.x + pos.x;
+}
+
+const std::list<IEntity*>& Map::getUpdateList() const
+{
+  return _updateList;
+}
+
+std::list<IEntity*>& Map::getUpdateList()
+{
+  return _updateList;
 }
 

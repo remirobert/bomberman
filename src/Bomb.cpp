@@ -74,7 +74,7 @@ bool	Bomb::destroyEntity(const glm::vec2 &pos)
 {
   IEntity *entity;
 
-  std::vector<APlayer *> players = _map->getPlayersAt(pos.x, pos.y);
+  std::vector<APlayer *> players = _map->getPlayersAt(glm::ivec2(pos.x, pos.y));
   for (std::vector<APlayer *>::iterator it = players.begin(); it != players.end(); ++it)
     {
       if ((*it)->getFlammePass() == false)
@@ -84,7 +84,7 @@ bool	Bomb::destroyEntity(const glm::vec2 &pos)
 	  (*it)->setStatus(DESTROY);
 	}
     }
-  entity = _map->getEntityAt(pos.x, pos.y);
+  entity = _map->getEntityAt(glm::ivec2(pos));
   if (entity == NULL)
     return true;
   if (entity->getType() == WALL)

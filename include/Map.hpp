@@ -27,6 +27,11 @@ class Map
 {
   friend class boost::serialization::access;
 
+public:
+  typedef std::list<IEntity*> UMap;
+  typedef std::list<IEntity*>::iterator iterator;
+  typedef std::list<IEntity*>::const_iterator const_iterator;
+
 private:
   glm::ivec2 _dim;
 
@@ -46,6 +51,9 @@ public:
   bool addEntity(IEntity *entity);
   bool deleteEntityAt(const glm::ivec2& pos);
   IEntity::Type getTypeAt(const glm::ivec2& pos) const;
+
+  std::list<IEntity*>& getUpdateList();
+  const std::list<IEntity*>& getUpdateList() const;
 
 public:
   template<class Archive>

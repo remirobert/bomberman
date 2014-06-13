@@ -27,7 +27,7 @@ int iaGetSizeMap(lua_State *L)
   ptr = static_cast<Ia *> (lua_touserdata(L, lua_gettop(L)));
   if (ptr == NULL)
     throw nFault("thisptr can't be null");
-  const glm::vec2& mapDim = ptr->getMapDimension();
+  const glm::ivec2& mapDim = ptr->getMapDimension();
   lua_pop(L, 1);
   lua_pushnumber(L, mapDim.x);
   lua_pushnumber(L, mapDim.y);
@@ -109,22 +109,22 @@ Ia::Ia(Map *currentMap, glm::vec2 const &pos, std::string const &fileName, const
 
   _actionPtr[SDLK_SPACE] = &Ia::bomb;
   _moveConf[SDLK_UP] = new movementCoef(0, glm::vec2(0.0, 1.0),
-				      glm::vec3(0, 0, 1),
-				      glm::vec2(0.7, 0.7),
-				      glm::vec2(0.2, 0.7));
+                                        glm::vec3(0, 0, 1),
+                                        glm::vec2(0.7, 0.7),
+                                        glm::vec2(0.2, 0.7));
   _moveConf[SDLK_DOWN] = new movementCoef(180, glm::vec2(0.0, -1.0),
-				      glm::vec3(0, 0, -1),
-				      glm::vec2(0.7, 0.2),
-				      glm::vec2(0.2, 0.2));
+                                          glm::vec3(0, 0, -1),
+                                          glm::vec2(0.7, 0.2),
+                                          glm::vec2(0.2, 0.2));
   _moveConf[SDLK_LEFT] = new movementCoef(-90, glm::vec2(-1.0, 0.0),
-				      glm::vec3(-1, 0, 0),
-				      glm::vec2(0.2, 0.7),
-				      glm::vec2(0.2, 0.2));
+                                          glm::vec3(-1, 0, 0),
+                                          glm::vec2(0.2, 0.7),
+                                          glm::vec2(0.2, 0.2));
 
   _moveConf[SDLK_RIGHT] = new movementCoef(90, glm::vec2(1.0, 0.0),
-				      glm::vec3(1, 0, 0),
-				      glm::vec2(0.7, 0.7),
-				      glm::vec2(0.7, 0.2));
+      glm::vec3(1, 0, 0),
+      glm::vec2(0.7, 0.7),
+      glm::vec2(0.7, 0.2));
 
   _L = luaL_newstate();
   if (_L == NULL)
@@ -176,8 +176,8 @@ int Ia::getMap(const int x, const int y) const
 {
   IEntity::Type elem;
 
-  elem = _map->getTypeAt(x, y);
-  if (elem != IEntity::BOMB && _map->getPlayersAt(x, y).size() != 0)
+  elem = _map->getTypeAt(glm::ivec2(x, y));
+  if (elem != IEntity::BOMB && _map->getPlayersAt(glm::ivec2(x, y)).size() != 0)
     return 7;
   return (static_cast<int> (elem));
 }
