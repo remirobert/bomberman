@@ -68,7 +68,7 @@ Game::Game(const glm::ivec2& win, int numberPlayer, int numberIA, std::string co
 
 void Game::init(const glm::ivec2& win)
 {
-  glm::vec2 mapDim = _currentMap->getDimension();
+  glm::ivec2 mapDim = _currentMap->getDimension();
   _ogl.init(win, mapDim, (_players.size() == 2));
 }
 

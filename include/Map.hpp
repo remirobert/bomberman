@@ -26,9 +26,6 @@ class APlayer;
 class Map
 {
   friend class boost::serialization::access;
-private:
-  typedef std::list<IEntity*> dynamMap;
-  typedef std::vector<IEntity*> staticMap;
 
 private:
   glm::ivec2 _dim;
@@ -54,34 +51,34 @@ public:
   template<class Archive>
   void serialize(Archive & ar, UNUSED const unsigned int version)
   {
-    ar & _dim.x;
-    ar & _dim.y;
-    for (LMap::iterator it = _map.begin(), end = _map.end();
-    	 it != end; it++)
-      {
-    	int type = static_cast<int>((*it)->getType());
-    	int status = static_cast<int>((*it)->getStatus());
-	float x = ((*it)->getPos()).x;
-	float y = ((*it)->getPos()).y;
-
-    	ar & x;
-	ar & y;
-    	ar & type;
-    	ar & status;
-      }
-    for (LMap::iterator it = _playerList.begin(), end = _playerList.end();
-    	 it != end; it++)
-      {
-    	int type = static_cast<int>((*it)->getType());
-    	int status = static_cast<int>((*it)->getStatus());
-	float x = ((*it)->getPos()).x;
-	float y = ((*it)->getPos()).y;
-
-    	ar & x;
-	ar & y;
-    	ar & type;
-    	ar & status;
-      }
+//    ar & _dim.x;
+//    ar & _dim.y;
+//    for (LMap::iterator it = _map.begin(), end = _map.end();
+//    	 it != end; it++)
+//      {
+//    	int type = static_cast<int>((*it)->getType());
+//    	int status = static_cast<int>((*it)->getStatus());
+//	float x = ((*it)->getPos()).x;
+//	float y = ((*it)->getPos()).y;
+//
+//    	ar & x;
+//	ar & y;
+//    	ar & type;
+//    	ar & status;
+//      }
+//    for (LMap::iterator it = _playerList.begin(), end = _playerList.end();
+//    	 it != end; it++)
+//      {
+//    	int type = static_cast<int>((*it)->getType());
+//    	int status = static_cast<int>((*it)->getStatus());
+//	float x = ((*it)->getPos()).x;
+//	float y = ((*it)->getPos()).y;
+//
+//    	ar & x;
+//	ar & y;
+//    	ar & type;
+//    	ar & status;
+//      }
   }
 
 private:
@@ -90,9 +87,8 @@ private:
   IEntity::Type getType(char c) const;
   IEntity *getEntityForMap(const glm::ivec2& pos, IEntity::Type i) const;
 
-  //Debug methods
-public:
-  void displayDebugMap() const;
+  size_t twoDToArray(const glm::ivec2& pos) const;
+
 };
 
 #endif /* !MAP_HPP_ */

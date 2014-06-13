@@ -29,7 +29,10 @@ Map::Map(std::string const &mapFileName)
 
 Map::~Map()
 {
-
+  for (std::vector<IEntity*>::iterator it = _map.begin(); it != _map.end(); ++it)
+    delete (*(it--));
+  for (std::list<IEntity*>::iterator it = _updateList.begin(); it != _updateList.end(); ++it)
+    delete (*(it--));
 }
 
 /*
@@ -46,7 +49,7 @@ IEntity::Type	Map::getType(char c) const
     }
   catch (const std::out_of_range &oor)
     {
-      std::cout << "Invalid type \'" << c << "\'" << std::endl;
+      std::cout << "Invalid type \'" << c << "\' in map." << std::endl;
     }
   return type;
 }
@@ -62,21 +65,20 @@ bool		Map::loadMapFromFile(std::string const &fileName)
     }
 
   std::string line;
-  int x = 0, y = 0;
+  glm::ivec2 pos(0, 0);
   IEntity	*entity;
 
   while (std::getline(file, line)) {
-      y = 0;
+      pos.y = 0;
       for (std::string::const_iterator it = line.begin(), end = line.end();
            it != end; ++it) {
-          if ((entity = this->getEntityForMap(x, y, this->getType(*it))))
-            this->addEntity(entity);
-          ++y;
+          if ((entity = getEntityForMap(pos, getType(*it))))
+            addEntity(entity);
+          ++pos.y;
         }
-      ++x;
+      ++pos.x;
     }
-  _dim.y = y;
-  _dim.x = x;
+  _dim = pos;
   file.close();
   return true;
 }
@@ -84,16 +86,18 @@ bool		Map::loadMapFromFile(std::string const &fileName)
 void		Map::loadRandomMap()
 {
   IEntity	*entity;
+  glm::ivec2 pos;
 
-  for (int i = 0; i < _dim.x; i++)
-    for (int j = 0; j < _dim.y; j++)
+  _map.resize(_dim.x * _dim.y);
+  for (pos.x = 0; i < _dim.x; ++pos.x)
+    for (pos.y = 0; j < _dim.y; ++pos.y)
       {
-        if (i == 0 || j == 0 || i == _dim.x - 1 || j == _dim.y - 1 || (j % 2 == 0 && i % 2 == 0))
-          entity = getEntityForMap(i, j, IEntity::WALL);
+        if (pos.x == 0 || pos.y == 0 || pos.x == _dim.x - 1 || pos.y == _dim.y - 1 || (pos.y % 2 == 0 && pos.x % 2 == 0))
+          entity = getEntityForMap(pos, IEntity::WALL);
         else if (rand() % 3 == 1)
-          entity = getEntityForMap(i, j, IEntity::BOX);
+          entity = getEntityForMap(pos, IEntity::BOX);
         else
-          entity = getEntityForMap(i, j, IEntity::NONE);
+          entity = getEntityForMap(pos, IEntity::NONE);
         if (entity)
           addEntity(entity);
       }
@@ -108,38 +112,6 @@ IEntity *Map::getEntityForMap(const glm::ivec2& pos, const IEntity::Type i) cons
   return entity;
 }
 
-/*
-** Debug methods
-*/
-
-void	Map::displayDebugMap() const
-{
-  bool	check;
-
-  if (!_map.empty())
-    {
-      for (int i = 0; i < _dim.x; ++i) {
-          for (int j = 0; j < _dim.y; ++j) {
-              check = false;
-              for (LMap::const_iterator it = _map.begin(); it != _map.end(); ++it) {
-                  if ((*(*it)).getPos().x == i && (*(*it)).getPos().y == j) {
-                      if (dynamic_cast<Box *>(*it) != NULL)
-                        std::cerr << "o";
-                      else if (dynamic_cast<Wall *>(*it) != NULL)
-                        std::cerr << "#";
-                      else
-                        std::cerr << "*";
-                      check = true;
-                    }
-                }
-              if (check == false)
-                std::cerr << " ";
-            }
-          std::cerr << std::endl;
-        }
-    }
-}
-
 const glm::ivec2 &Map::getDimension() const
 {
   return _dim;
@@ -151,18 +123,23 @@ const glm::ivec2 &Map::getDimension() const
 
 IEntity		*Map::getEntityAt(const glm::ivec2& pos) const
 {
-  for (LMap::const_iterator it = _map.begin(), end = _map.end(); it != end; ++it)
-    if ((*(*it)).getPos() == pos)
-      return *it;
-  return NULL;
+  size_t posInArray = twoDToArray(pos);
+  if (posInArray >= _map.size())
+    return NULL;
+  return _map.at(posInArray);
 }
 
 std::vector<APlayer *> Map::getPlayersAt(const glm::ivec2& pos) const
 {
   int x1, y1;
+  int x, y;
+  x = pos.x;
+  y = pos.y;
   std::vector<APlayer *> entity;
 
-  for (LMap::const_iterator it = _playerList.begin(), end = _playerList.end(); it != end; ++it)
+
+  for (std::list<IEntity*>::const_iterator it = _updateList.begin(), end = _updateList.end();
+       it != end; ++it)
     {
       x1 = (*it)->getPos().x + 0.7;
       y1 = (*it)->getPos().y + 0.7;
@@ -182,18 +159,15 @@ std::vector<APlayer *> Map::getPlayersAt(const glm::ivec2& pos) const
 
 IEntity::Type	Map::getTypeAt(const glm::ivec2& pos) const
 {
-  IEntity::Type type = IEntity::NONE;
+  IEntity::Type type;
+  IEntity* ent;
 
-  for (LMap::const_iterator it = _map.begin(), end = _map.end(); it != end; ++it)
-    if ((*(*it)).getPos() == pos)
-      {
-        type = (*it)->getType();
-        if (type == IEntity::PLAYER)
-          type = IEntity::NONE;
-        if (type != IEntity::NONE)
-          return type;
-      }
-  return type;
+  size_t posInArray = twoDToArray(pos);
+  if (posInArray >= _map.size())
+    return IEntity::NONE;
+  ent = _map.at(posInArray);
+  type = ent->getType();
+  return (type == IEntity::PLAYER) ? IEntity::NONE : type;
 }
 
 /*
@@ -202,12 +176,11 @@ IEntity::Type	Map::getTypeAt(const glm::ivec2& pos) const
 
 bool Map::addEntity(IEntity *entity)
 {
-  if (entity->getType() != IEntity::PLAYER)
-    _map.push_back(entity);
-  if (entity->getType() == IEntity::PLAYER) {
-      _playerList.push_back(entity);
-    }
-  else if (entity->getType() != IEntity::WALL)
+  glm::ivec2 pos = entity->getPos();
+
+  if (entity->getType() == IEntity::WALL || entity->getType() == IEntity::BOX)
+    _map[twoDToArray(pos)] = entity;
+  else
     _updateList.push_back(entity);
   return true;
 }
@@ -218,16 +191,20 @@ bool Map::addEntity(IEntity *entity)
 
 bool	Map::deleteEntityAt(const glm::ivec2& pos)
 {
-  IEntity *entity;
+  IEntity::Type type;
+  IEntity* ent;
 
-  for (LMap::iterator it = _map.begin(); it != _map.end(); ++it)
-    {
-      if ((*(*it)).getPos().x == x && (*(*it)).getPos().y == y) {
-          entity = *it;
-          delete entity;
-          _map.erase(it);
-          return true;
-        }
-    }
-  return false;
+  size_t posInArray = twoDToArray(pos);
+  if (posInArray >= _map.size())
+    return IEntity::NONE;
+  ent = _map.at(posInArray);
+  delete entity;
+  _map[posInArray] = NULL;
+  return true;
 }
+
+size_t Map::twoDToArray(const glm::ivec2& pos) const
+{
+  return pos.y * _dim.x + pos.x;
+}
+
