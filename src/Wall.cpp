@@ -1,6 +1,10 @@
+#include <boost/serialization/export.hpp>
+
 #include "Wall.hpp"
 #include "Cube.hpp"
 #include "config.h"
+
+// BOOST_CLASS_EXPORT_IMPLEMENT(Wall)
 
 Wall::Wall(const glm::vec2 &pos)
   : _vec(pos)

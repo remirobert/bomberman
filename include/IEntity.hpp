@@ -1,12 +1,20 @@
 #ifndef IENTITY_HPP_
 # define IENTITY_HPP_
 
+# include <boost/archive/text_oarchive.hpp>
+# include <boost/archive/text_iarchive.hpp>
+# include <boost/serialization/export.hpp>
+
 # include <Clock.hh>
 # include <Input.hh>
 # include <AShader.hh>
 
+# include "config.h"
+
 class IEntity
 {
+  friend class boost::serialization::access;
+
 public:
   enum Type
     {
@@ -38,6 +46,10 @@ public:
       DESTROY,
       REMOVE
     };
+
+  template<class Archive>
+  void serialize(UNUSED Archive & ar, UNUSED const unsigned int version)
+  {}
 
   virtual ~IEntity() {}
   virtual const glm::vec2 &getPos() const = 0;

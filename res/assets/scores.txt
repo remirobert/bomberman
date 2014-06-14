@@ -8,5 +8,6 @@ toto:60
 Jean:20
 ze:4
 Theo:1
+lol:0
 John:-10
 Luc:-100

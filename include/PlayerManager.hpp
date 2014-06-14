@@ -26,9 +26,33 @@ public:
   const std::list<IEntity*>& getNearList() const {return _nearEntity;};
   bool getDead(LeaderScores *) const;
   void setWin();
+
+public:
+    template<class Archive>
+    void save(Archive & ar, UNUSED unsigned int version) const
+    {
+      ar & _timer;
+      ar & _score;
+      ar & _first;
+      ar & _win;
+      ar & _player;
+    }
+
+    template<class Archive>
+    void load(UNUSED Archive & ar, UNUSED unsigned int version)
+    {
+      ar & _timer;
+      ar & _score;
+      ar & _first;
+      ar & _win;
+      ar & _player;
+    }
+  BOOST_SERIALIZATION_SPLIT_MEMBER()
+
 private:
   PlayerManager(const PlayerManager& p);
   void updateNearList(const Map& map);
+
 private:
   float _timer;
   Player _player;

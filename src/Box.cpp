@@ -1,6 +1,10 @@
+#include <boost/serialization/export.hpp>
+
 #include "ResourceManager.hpp"
 #include "Box.hpp"
 #include "config.h"
+
+// BOOST_CLASS_EXPORT_IMPLEMENT(Box)
 
 Box::Box(const glm::vec2 &pos) : _vec(pos)
 {

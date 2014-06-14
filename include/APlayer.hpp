@@ -1,8 +1,8 @@
 #ifndef APLAYER_HPP_
 # define APLAYER_HPP_
 
-# include <boost/archive/binary_oarchive.hpp>
-# include <boost/archive/binary_iarchive.hpp>
+# include <boost/archive/text_oarchive.hpp>
+# include <boost/archive/text_iarchive.hpp>
 # include <boost/serialization/base_object.hpp>
 
 # include "IEntity.hpp"
@@ -82,6 +82,11 @@ public:
   template<class Archive>
   void serialize(Archive & ar, UNUSED const unsigned int version)
   {
+    boost::serialization::void_cast_register<APlayer, IEntity>(
+      static_cast<APlayer*>(NULL),
+      static_cast<IEntity*>(NULL)
+    );
+    ar & _name;
     ar & _pos.x;
     ar & _pos.y;
     ar & _speed;

@@ -3,8 +3,8 @@
 
 # include <string>
 
-# include <boost/archive/binary_oarchive.hpp>
-# include <boost/archive/binary_iarchive.hpp>
+# include <boost/archive/text_oarchive.hpp>
+# include <boost/archive/text_iarchive.hpp>
 # include <boost/serialization/base_object.hpp>
 
 # include "config.h"
@@ -58,6 +58,7 @@ public:
   }
 
 public:
+  Ia(): APlayer(glm::vec2(0, 0), NULL, glm::vec4(0,0,0,0), "Player") {}
   Ia(Map *currentMap, glm::vec2 const &pos, std::string const &fileName, const glm::vec4& color);
   ~Ia();
 

@@ -13,6 +13,11 @@
 # include "APlayer.hpp"
 # include "SoundManager.hpp"
 
+# include <boost/archive/text_oarchive.hpp>
+# include <boost/archive/text_iarchive.hpp>
+# include <boost/serialization/base_object.hpp>
+# include <boost/serialization/export.hpp>
+
 struct bonusConf
 {
   bonusConf(const glm::vec4 &color, int time) {
@@ -25,6 +30,8 @@ struct bonusConf
 
 class ABonus : public IEntity
 {
+  friend class boost::serialization::access;
+
 protected:
   enum BonusType
     {
@@ -47,6 +54,7 @@ protected:
   IEntity::Status _status;
   Timer		_toDisplay, _effectTime;
   BonusType	_type;
+
 public:
   ABonus(BonusType type, const glm::vec2 &pos, double effectTime);
   virtual ~ABonus();
@@ -65,8 +73,19 @@ public:
   const std::string getTexturePath() const;
   virtual std::string toString() = 0;
   bool	  operator==(const ABonus &);
+
 protected:
   virtual void stop(APlayer *player) = 0;
+
+private:
+  template<class Archive>
+  void serialize(Archive & ar, UNUSED const unsigned int version)
+  {
+    boost::serialization::void_cast_register<ABonus, IEntity>(
+      static_cast<ABonus*>(NULL),
+      static_cast<IEntity*>(NULL)
+    );
+  }
 };
 
 #endif /* _ABONUS_H_ */

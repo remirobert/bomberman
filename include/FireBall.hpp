@@ -9,9 +9,17 @@
 # include "ResourceManager.hpp"
 # include "BonusFactory.hpp"
 
+# include <boost/archive/text_oarchive.hpp>
+# include <boost/archive/text_iarchive.hpp>
+# include <boost/serialization/base_object.hpp>
+# include <boost/serialization/export.hpp>
+
 class FireBall : public IEntity
 {
+  friend class boost::serialization::access;
+
 public:
+  FireBall() {}
   FireBall(const glm::vec2 &pos, const movementCoef *mcoef, Map *map, APlayer *player);
   virtual ~FireBall();
   virtual const glm::vec2 &getPos() const;
@@ -24,6 +32,14 @@ public:
 
 private:
   void	destroyEntity(IEntity *entity);
+  template<class Archive>
+  void serialize(Archive & ar, UNUSED const unsigned int version)
+  {
+    boost::serialization::void_cast_register<FireBall, IEntity>(
+      static_cast<FireBall*>(NULL),
+      static_cast<IEntity*>(NULL)
+    );
+  }
 
 private:
   GameGeometry* _obj;

@@ -1,9 +1,13 @@
 #ifndef _SAVEMANAGER_H_
 # define _SAVEMANAGER_H_
 
+# include <sys/stat.h>
+# include <sys/types.h>
 # include <fstream>
-# include <boost/archive/binary_oarchive.hpp>
-# include <boost/archive/binary_iarchive.hpp>
+# include <cerrno>
+
+# include <boost/archive/text_oarchive.hpp>
+# include <boost/archive/text_iarchive.hpp>
 
 # include "Game.hpp"
 
@@ -12,18 +16,27 @@ class SaveManager
 public:
   static void save(Game *game)
   {
-    std::ofstream ofs(std::string("save_" + getDate()).c_str());
+    std::cout << "Saving..." << std::endl;
+    if (mkdir("./save", 0755) < 0 && errno != EEXIST)
+      return ;
+    std::ofstream ofs(std::string("./save/save_" + getDate()).c_str());
 
-    boost::archive::binary_oarchive oa(ofs);
-    oa << *game;
+    if (ofs.is_open())
+      {
+	boost::archive::text_oarchive oa(ofs);
+	oa << *game;
+      }
   }
 
   static void load(const std::string& filename, Game *game)
   {
-    std::ifstream ifs(filename.c_str());
+    std::ifstream ifs(std::string("./save/" + filename).c_str());
 
-    boost::archive::binary_iarchive ia(ifs);
-    ia >> *game;
+    if (ifs.is_open())
+      {
+	boost::archive::text_iarchive ia(ifs);
+	ia >> *game;
+      }
   }
 };
 

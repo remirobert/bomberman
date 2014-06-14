@@ -5,6 +5,10 @@
 # include <stdlib.h>
 # include <cstdlib>
 
+# include <boost/archive/text_oarchive.hpp>
+# include <boost/archive/text_iarchive.hpp>
+# include <boost/serialization/export.hpp>
+
 # include "Map.hpp"
 # include "Cube.hpp"
 # include "config.h"
@@ -19,6 +23,8 @@
 
 class Bomb : public IEntity
 {
+  friend class boost::serialization::access;
+
   typedef std::list<Fire *> FireList;
 
 private:
@@ -41,6 +47,7 @@ private:
 
   std::vector<ABonus *> _generatedBonus;
 public:
+  Bomb() : _time(2.5), _staytime(0.25) {}
   Bomb(APlayer *player, const glm::vec2 &pos, int range, Map *map);
   virtual ~Bomb();
   virtual const glm::vec2 &getPos() const;
@@ -51,10 +58,19 @@ public:
   virtual IEntity::Status getStatus() const;
   virtual void setStatus(IEntity::Status status);
 private:
-
   void	explode(gdl::Clock const &clock);
   bool	destroyEntity(const glm::vec2 &);
   bool	spread();
+
+private:
+  template<class Archive>
+  void serialize(Archive & ar, UNUSED const unsigned int version)
+  {
+    boost::serialization::void_cast_register<Bomb, IEntity>(
+      static_cast<Bomb*>(NULL),
+      static_cast<IEntity*>(NULL)
+    );
+  }
 };
 
 #endif /* !BOMB_HPP_ */

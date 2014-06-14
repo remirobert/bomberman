@@ -16,7 +16,18 @@
 #include <string>
 #include <vector>
 
+#include "FireBall.hpp"
 #include "SaveManager.hpp"
+
+BOOST_CLASS_EXPORT_GUID(Box, "Box")
+BOOST_CLASS_EXPORT_GUID(Wall, "Wall")
+BOOST_CLASS_EXPORT_GUID(Bomb, "Bomb")
+BOOST_CLASS_EXPORT_GUID(ABonus, "ABonus")
+BOOST_CLASS_EXPORT_GUID(APlayer, "APlayer")
+BOOST_CLASS_EXPORT_GUID(Fire, "Fire")
+BOOST_CLASS_EXPORT_GUID(FireBall, "FireBall")
+BOOST_CLASS_EXPORT_GUID(Player, "Player")
+BOOST_CLASS_EXPORT_GUID(Ia, "Ia")
 
 GameEngine::GameEngine()
   : _state(Intro), _init(false), _intro(NULL), _game(NULL), _context(new gdl::SdlContext),
